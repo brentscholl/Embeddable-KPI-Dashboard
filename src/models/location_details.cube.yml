@@ -1,0 +1,48 @@
+cubes:
+  - name: location_details
+    title: Location Details
+    sqlTable: location_details
+
+    dimensions:
+      - name: id
+        title: ID
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: timezone_id
+        title: Timezone ID
+        sql: timezone_id
+        type: number
+
+      - name: address_blob
+        title: Address Blob
+        sql: address_blob
+        type: string
+
+      - name: city
+        title: City
+        sql: city
+        type: string
+
+      - name: state
+        title: State
+        sql: state
+        type: string
+
+      - name: country_code
+        title: Country Code
+        sql: country_code
+        type: string
+
+      - name: postal_code
+        title: Postal Code
+        sql: postal_code
+        type: string
+
+      - name: dst
+        title: Daylight Saving Time
+        sql: dst
+        type: string
+
+    measures: []

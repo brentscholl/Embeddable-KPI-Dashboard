@@ -1,0 +1,31 @@
+cubes:
+  - name: tracking_statuses
+    sql_table: tracking_statuses
+
+    dimensions:
+      - name: id
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: type
+        sql: type
+        type: string
+
+      - name: code
+        sql: code
+        type: string
+
+      - name: description
+        sql: description
+        type: string
+
+      - name: common_name
+        sql: common_name
+        type: string
+
+      - name: terminal_status
+        sql: terminal_status
+        type: boolean
+
+    measures: []

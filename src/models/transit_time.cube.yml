@@ -1,0 +1,84 @@
+
+cubes:
+  - name: transit_days
+    title: "Transit Days"
+    sql: >
+      SELECT 
+        tracking_numbers.tracking_number,
+        tracking_events.utc_datetime AS date_delivered, 
+        (
+          SELECT 
+            te2.utc_datetime 
+          FROM 
+            tracking_events AS te2 
+            JOIN tracking_statuses AS ts2 ON te2.tracking_status_id = ts2.id 
+          WHERE 
+            te2.tracking_number_id = tracking_numbers.id 
+            AND ts2.common_name = 'Label Created' 
+          LIMIT 
+            1
+        ) AS label_created, 
+        5 * (
+          DATEDIFF(
+            tracking_events.utc_datetime, 
+            (
+              SELECT 
+                te3.utc_datetime 
+              FROM 
+                tracking_events AS te3 
+                JOIN tracking_statuses AS ts3 ON te3.tracking_status_id = ts3.id 
+              WHERE 
+                te3.tracking_number_id = tracking_numbers.id 
+                AND ts3.common_name = 'Label Created' 
+              LIMIT 
+                1
+            )
+          ) DIV 7
+        ) + MID(
+          '0123444401233334012222340111123400012345001234550', 
+          7 * WEEKDAY(
+            (
+              SELECT 
+                te4.utc_datetime 
+              FROM 
+                tracking_events AS te4 
+                JOIN tracking_statuses AS ts4 ON te4.tracking_status_id = ts4.id 
+              WHERE 
+                te4.tracking_number_id = tracking_numbers.id 
+                AND ts4.common_name = 'Label Created' 
+              LIMIT 
+                1
+            )
+          ) + WEEKDAY(tracking_events.utc_datetime) + 1, 
+          1
+        ) + 1 AS transit_days
+      FROM 
+        tracking_numbers
+        JOIN tracking_events ON tracking_events.tracking_number_id = tracking_numbers.id AND tracking_events.id = tracking_numbers.latest_event_id
+        JOIN tracking_statuses ON tracking_statuses.id = tracking_events.tracking_status_id
+        JOIN location_details ON location_details.id = tracking_events.location_detail_id
+        INNER JOIN carriers ON carriers.id = tracking_numbers.carrier_id
+        INNER JOIN team_tracking_number ON team_tracking_number.tracking_number_id = tracking_numbers.id
+        INNER JOIN teams ON teams.id = team_tracking_number.team_id
+      WHERE 
+        tracking_events.utc_datetime > NOW() - INTERVAL 30 DAY
+        AND tracking_statuses.common_name = 'Delivered'
+        AND teams.hashed_team_id = '{ COMPILE_CONTEXT.securityContext.hashed_team_id }'
+
+    dimensions:
+      - name: label_create
+        sql: label_create
+        type: time
+        title: "Create Date"
+
+    measures:
+      - name: tracking_number
+        sql: tracking_number
+        type: count
+        title: "Tracking Number"
+
+      - name: transit_days
+        sql: transit_days
+        type: avg
+        title: "Average Days"
+

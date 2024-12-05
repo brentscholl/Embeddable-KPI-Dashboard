@@ -1,0 +1,42 @@
+cubes:
+  - name: shipping_by_date
+    data_source: clickhouse
+    title: Shipping By Date
+    sql: >
+      SELECT 
+        tracking_numbers.tracking_number as tracking_number,
+        tracking_numbers.label_created_at as label_created_at,
+        carriers.name AS carrier_name
+      FROM
+        tracking_numbers
+      INNER JOIN
+        carriers ON carriers.id = tracking_numbers.carrier_id
+      INNER JOIN
+        team_tracking_number ON team_tracking_number.tracking_number_id = tracking_numbers.id
+      INNER JOIN
+        teams ON teams.id = team_tracking_number.team_id
+      WHERE
+        tracking_numbers.label_created_at >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+        AND teams.hashed_team_id = '{ COMPILE_CONTEXT.securityContext.hashed_team_id }'
+
+    dimensions:
+      - name: shipped_date
+        sql: label_created_at
+        type: time
+        title: 'Shipped Date'
+
+      - name: carrier
+        sql: carrier_name
+        type: string
+        title: 'Carrier'
+
+#      - name: tracking_number
+#        sql: tracking_number
+#        type: string
+#        title: 'Tracking Number'
+
+    measures:
+      - name: package_count
+        sql: tracking_number
+        type: count_distinct
+        title: 'Package Count'

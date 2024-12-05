@@ -1,0 +1,26 @@
+cubes:
+  - name: tracking_number_count
+    title: 'Tracking Number Count'
+    sqlTable: tracking_numbers
+    joins:
+      - name: tracking_numbers
+        sql: "{CUBE}.tracking_number_id = {tracking_numbers}.id"
+        relationship: many_to_one
+      - name: teams
+        sql: "{CUBE}.team_id = {teams}.id"
+        relationship: many_to_one
+      - name: team_tracking_number
+        sql: "{tracking_numbers}.id = {team_tracking_number}.tracking_number_id"
+        relationship: many_to_one
+
+    dimensions:
+      - name: id
+        title: 'ID'
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: team_id
+        title: 'Team ID'
+        sql: team_id
+        type: string

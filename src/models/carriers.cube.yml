@@ -1,0 +1,27 @@
+cubes:
+  - name: carriers
+    title: Carriers
+    sqlTable: carriers
+
+    dimensions:
+      - name: id
+        title: Carrier ID
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: name
+        title: Carrier Name
+        sql: name
+        type: string
+
+      - name: code
+        title: Carrier Code
+        sql: code
+        type: string
+
+    measures:
+      - name: count
+        sql: COUNT(*)
+        type: count
+        title: 'Count'

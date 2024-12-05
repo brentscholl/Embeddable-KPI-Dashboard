@@ -1,0 +1,43 @@
+cubes:
+  - name: tracking_events
+    title: Tracking Events
+    sql_table: tracking_events
+
+    dimensions:
+      - name: id
+        title: ID
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: tracking_number_id
+        title: Tracking Number ID
+        sql: tracking_number_id
+        type: number
+
+      - name: tracking_status_id
+        title: Tracking Status ID
+        sql: tracking_status_id
+        type: number
+
+      - name: location_description
+        title: Location Description
+        sql: location_description
+        type: string
+
+      - name: local_datetime
+        title: Local Datetime
+        sql: local_datetime
+        type: time
+
+      - name: utc_datetime
+        title: UTC Datetime
+        sql: utc_datetime
+        type: time
+
+      - name: location_detail_id
+        title: Location Detail ID
+        sql: location_detail_id
+        type: number
+
+    measures: []

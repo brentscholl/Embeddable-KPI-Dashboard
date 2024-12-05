@@ -1,0 +1,36 @@
+cubes:
+  - name: tracking_numbers
+    title: 'Tracking Numbers'
+    sql_table: tracking_numbers
+
+    joins:
+      - name: carriers
+        sql: "{tracking_numbers}.carrier_id = {carriers}.id"
+        relationship: many_to_one
+
+    dimensions:
+      - name: id
+        title: 'ID'
+        type: number
+        sql: id
+        primary_key: true
+
+      - name: carrier_id
+        title: 'Carrier ID'
+        type: number
+        sql: carrier_id
+
+      - name: tracking_number
+        title: 'Tracking Number'
+        type: string
+        sql: tracking_number
+
+      - name: label_created_at
+        title: 'Label Created At'
+        type: time
+        sql: TO_TIMESTAMP(label_created_at)
+
+    measures:
+      - name: tracking_count
+        type: count
+        title: 'Tracking Count'

@@ -1,0 +1,122 @@
+cubes:
+  - name: tracking_status_count_by_carrier
+    data_source: clickhouse
+    title: 'Tracking Status Count by Carrier'
+    sql: >
+      SELECT
+        tracking_numbers.tracking_number as tracking_number,
+        carriers.code as carrier_code,
+        carriers.name as carrier_name,
+        tracking_statuses.common_name as status_name,
+        tracking_numbers.label_created_at as label_created_at
+      FROM
+        tracking_numbers
+      INNER JOIN
+        carriers ON carriers.id = tracking_numbers.carrier_id
+      INNER JOIN
+        tracking_events ON tracking_events.id = tracking_numbers.latest_event_id
+      INNER JOIN
+        tracking_statuses ON tracking_statuses.id = tracking_events.tracking_status_id
+      INNER JOIN
+        team_tracking_number ON team_tracking_number.tracking_number_id = tracking_numbers.id
+      INNER JOIN
+        teams ON teams.id = team_tracking_number.team_id
+      WHERE
+        teams.hashed_team_id = '{ COMPILE_CONTEXT.securityContext.hashed_team_id }'
+
+    dimensions:
+      - name: tracking_number
+        sql: tracking_number
+        type: string
+        title: 'Tracking Number'
+
+      - name: carrier_code
+        sql: carrier_code
+        type: string
+        title: 'Carrier Code'
+
+      - name: carrier_name
+        sql: carrier_name
+        type: string
+        title: 'Carrier Name'
+
+      - name: status_name
+        sql: status_name
+        type: string
+        title: 'Status Name'
+
+      - name: label_created_at
+        sql: label_created_at
+        type: time
+        title: 'Label Created At'
+
+    measures:
+      - name: package_count
+        sql: tracking_numbers.tracking_number
+        type: count_distinct
+        title: 'Package Count'
+
+      - name: ups_count
+        sql: CASE WHEN carrier_code = 'ups' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'UPS Package Count'
+
+      - name: fedex_count
+        sql: CASE WHEN carrier_code = 'fedex' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'FedEx Package Count'
+
+      - name: usps_count
+        sql: CASE WHEN carrier_code = 'usps' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'USPS Package Count'
+
+      - name: dhl_count
+        sql: CASE WHEN carrier_code = 'dhl' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'DHL Package Count'
+
+      - name: ontrac_count
+        sql: CASE WHEN carrier_code = 'ontrac' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'OnTrac Package Count'
+
+      - name: label_created_count
+        sql: CASE WHEN status_name = 'Label Created' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Label Created Count'
+
+      - name: in_transit_count
+        sql: CASE WHEN status_name = 'In Transit' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'In Transit Count'
+
+      - name: out_for_delivery_count
+        sql: CASE WHEN status_name = 'Out for Delivery' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Out for Delivery Count'
+
+      - name: delivered_count
+        sql: CASE WHEN status_name = 'Delivered' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Delivered Count'
+
+      - name: delayed_count
+        sql: CASE WHEN status_name = 'Delayed' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Delayed Count'
+
+      - name: weather_delayed_count
+        sql: CASE WHEN status_name = 'Weather Delay' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Weather Delayed Count'
+
+      - name: exceptions_count
+        sql: CASE WHEN status_name = 'Exception' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Exceptions Count'
+
+      - name: voided_count
+        sql: CASE WHEN status_name = 'Voided' THEN tracking_number ELSE NULL END
+        type: count_distinct
+        title: 'Voided Count'

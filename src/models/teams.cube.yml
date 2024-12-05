@@ -1,0 +1,33 @@
+cubes:
+  - name: teams
+    title: Teams
+    sql_table: teams
+
+    dimensions:
+      - name: id
+        title: ID
+        sql: id
+        type: number
+        primary_key: true
+
+      - name: hashed_team_id
+        title: Hashed Team ID
+        sql: hashed_team_id
+        type: string
+
+      - name: user_id
+        title: User ID
+        sql: user_id
+        type: number
+
+      - name: name
+        title: Team Name
+        sql: name
+        type: string
+
+      - name: personal_team
+        title: Personal Team
+        sql: personal_team
+        type: boolean
+
+    measures: []

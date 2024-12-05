@@ -1,0 +1,58 @@
+cubes:
+  - name: status_count_by_state
+    data_source: clickhouse
+    title: "Status Count by State"
+    sql: >
+      SELECT
+          tracking_numbers.label_created_at AS label_created_at,
+          location_details.state AS state,
+          tracking_statuses.common_name AS status,
+          carriers.name AS carrier_name
+      FROM 
+          tracking_numbers
+      LEFT JOIN 
+          tracking_events ON tracking_events.id = tracking_numbers.latest_event_id
+      LEFT JOIN 
+          tracking_statuses ON tracking_statuses.id = tracking_events.tracking_status_id
+      LEFT JOIN 
+          location_details ON location_details.id = tracking_events.location_detail_id
+      INNER JOIN
+          carriers ON carriers.id = tracking_numbers.carrier_id
+      INNER JOIN
+          team_tracking_number ON team_tracking_number.tracking_number_id = tracking_numbers.id
+      INNER JOIN
+          teams ON teams.id = team_tracking_number.team_id
+      WHERE
+          teams.hashed_team_id = '{ COMPILE_CONTEXT.securityContext.hashed_team_id }'
+
+    dimensions:
+      - name: state
+        title: "State"
+        sql: state
+        type: string
+
+      - name: status
+        title: "Status"
+        sql: status
+        type: string
+
+      - name: label_created_at
+        title: "Label Created At"
+        sql: label_created_at
+        type: time
+
+      - name: carrier_name
+        sql: carrier_name
+        type: string
+        title: 'Carrier Name'
+
+    measures:
+      - name: status_count
+        title: "Status Count"
+        type: count
+        shown: true
+
+      - name: state_count
+        sql: state
+        type: count
+        title: "State Count"
